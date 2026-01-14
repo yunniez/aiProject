@@ -1,0 +1,2 @@
+### AI 분석 테스트
+GET http://localhost:8080/ai/analyze?description=자바5년차

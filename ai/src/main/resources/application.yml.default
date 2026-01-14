@@ -1,0 +1,5 @@
+# application.yml.default 내용
+spring:
+  ai:
+    openai:
+      api-key: ${KEY값}
