@@ -1,4 +1,4 @@
-package org.example.ai;
+package org.example.ai.aiRecord;
 
 import java.util.List;
 /**

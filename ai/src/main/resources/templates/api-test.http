@@ -1,0 +1,11 @@
+### 환경 변수 설정
+@baseUrl = http://localhost:8080
+
+### [1번] 기본 인사 테스트
+GET {{baseUrl}}/ai/test?message=안녕피티야
+
+### [2번] AI 커리어 코치 - 적합 공고 테스트 (Java/Spring)
+GET {{baseUrl}}/ai/coach?jobDescription=경력 자바 백엔드 개발자 모집. 스택은 Spring Boot, JPA, MySQL입니다.
+
+### [3번] AI 커리어 코치 - 비적합 공고 테스트 (Python)
+GET {{baseUrl}}/ai/coach?jobDescription=파이썬 장고(Django) 기반 데이터 엔지니어 모집합니다.

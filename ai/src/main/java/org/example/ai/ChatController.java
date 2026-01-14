@@ -1,18 +1,24 @@
 package org.example.ai;
 
+import org.example.ai.aiEntity.CareerResult;
+import org.example.ai.aiRecord.CareerMatching;
+import org.example.ai.aiRecord.JobAnalysis;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @RestController
 public class ChatController {
 
     private final ChatClient chatClient;
+    private final CareerRepository careerRepository;
 
-    // 생성자 주입 (Spring AI의 ChatClient.Builder를 사용)
-    public ChatController(ChatClient.Builder builder) {
-        this.chatClient = builder.build(); // 저장
+    public ChatController(ChatClient.Builder builder, CareerRepository careerRepository) {
+        this.chatClient = builder.build();
+        this.careerRepository = careerRepository;
     }
 
     @GetMapping("/ai/test")
@@ -39,6 +45,29 @@ public class ChatController {
         return chatClient.prompt()
                 .user(mockDescription)
                 .call()
-                .entity(JobAnalysis.class); // Spring AI가 JSON을 JobAnalysis 객체로 변환!
+                .entity(JobAnalysis.class); // Spring AI가 JSON을 JobAnalysis 객체변환
     }
+
+    @GetMapping("/ai/coach")
+    public CareerResult careerCoach(@RequestParam(value = "jobDescription") String jobDescription) {
+
+        CareerMatching matching = chatClient.prompt()
+                .system("너는 전문 헤드헌터야.")
+                .user(jobDescription)
+                .call()
+                .entity(CareerMatching.class);
+
+        // 분석 결과를 엔티티로 변환하여 DB 저장
+        CareerResult result = CareerResult.builder()
+                .jobTitle(matching.jobTitle())
+                .matchingScore(matching.matchingScore())
+                .strongPoints(matching.strongPoints())
+                .weakPoints(matching.weakPoints())
+                .advice(matching.advice())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        return careerRepository.save(result); // 저장된 데이터 반환
+    }
+
 }
