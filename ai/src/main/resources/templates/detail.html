@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<div layout:fragment="content">
+    <div class="resume-detail-container">
+
+        <div class="detail-header">
+            <div>
+                <h2 th:text="${result.jobTitle}">공고 제목</h2>
+                <p class="text-muted mt-2">
+                    분석 일시: <span th:text="${#temporals.format(result.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                </p>
+            </div>
+            <div class="score-circle">
+                <span th:text="${result.matchingScore}">95</span>
+                <small>점</small>
+            </div>
+        </div>
+
+        <div class="ai-report">
+            <h4>✨ AI의 전문 코칭</h4>
+            <div class="advice" th:text="${result.advice}" style="line-height: 1.8;">
+                AI가 분석한 상세 내용이 여기에 들어갑니다.
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/ai/history" class="btn btn-secondary">
+                <i class="bi bi-list"></i> 목록으로 돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+</html>

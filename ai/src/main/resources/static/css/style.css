@@ -1,0 +1,166 @@
+/* 이력서 상세 페이지 전용 스타일 */
+.resume-detail-container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.detail-header {
+    border-bottom: 2px solid #f0f2f5;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detail-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-complete { background: #e3fcef; color: #00875a; }
+
+/* AI 분석 결과 섹션 */
+.ai-report {
+    background: #f8fbff;
+    border-left: 5px solid #007bff;
+    padding: 25px;
+    border-radius: 8px;
+    margin: 30px 0;
+}
+
+.ai-report h4 {
+    color: #0056b3;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 이력서 원문 섹션 */
+.resume-content {
+    line-height: 1.8;
+    color: #4a5568;
+    white-space: pre-wrap; /* 줄바꿈 유지 */
+}
+
+.action-buttons {
+    margin-top: 40px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-secondary {
+    background: #edf2f7;
+    color: #4a5568;
+    border: none;
+}
+/* 점수 동그라미 배지 */
+.score-circle {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+}
+
+.score-circle span {
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.score-circle small {
+    font-size: 0.7rem;
+    margin-top: -5px;
+}
+/* 업로드 박스 꾸미기 */
+.upload-box {
+    border: 2px dashed #cbd5e0;
+    padding: 30px;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+.upload-box:hover {
+    border-color: #007bff;
+    background-color: #f0f7ff;
+}
+
+/* 버튼 커스텀 */
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    transition: transform 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,123,255,0.4);
+}/* 테이블 행에 마우스 올렸을 때 부드러운 효과 */
+.table-hover tbody tr:hover {
+    background-color: #f8fbff;
+    transition: background-color 0.2s ease;
+}
+
+/* 텍스트 강조용 */
+.fw-bold { font-weight: 700 !important; }
+
+/* 테이블 셀 최소 높이 및 세로 중앙 정렬 강제 */
+.table td {
+    height: 70px; /* 모든 행의 높이를 통일 */
+    vertical-align: middle !important;
+}
+
+/* 데이터가 너무 길 때 줄바꿈 방지 및 말줄임표(...) */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 카드 그림자 더 부드럽게 */
+.shadow-sm {
+    box-shadow: 0 .125rem .5rem rgba(0,0,0,.05)!important;
+}
+
+/* 메인 페이지 전용 스타일 */
+.main-hero {
+    padding: 60px 0;
+}
+
+.main-card {
+    transition: all 0.3s ease;
+    border-radius: 20px !important;
+}
+
+.main-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+}
+
+.icon-box {
+    font-size: 3rem;
+}
+
+/* 폰트 굵기 보정 */
+.display-4 {
+    letter-spacing: -1px;
+}

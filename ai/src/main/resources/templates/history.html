@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark">📜 분석 히스토리</h2>
+                <a href="/resume/upload" class="btn btn-primary">새로 분석하기</a>
+            </div>
+
+            <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0" style="table-layout: fixed;"> <thead class="bg-light">
+                    <tr>
+                        <th style="width: 40%" class="ps-4 py-3">공고명</th>
+                        <th style="width: 20%" class="py-3 text-center">매칭 점수</th>
+                        <th style="width: 25%" class="py-3 text-center">분석 시간</th>
+                        <th style="width: 15%" class="text-center pe-4 py-3">액션</th>
+                    </tr>
+                    </thead>
+                        <tbody>
+                        <tr th:each="result : ${history}">
+                            <td class="ps-4 align-middle text-truncate">
+                                    <span class="fw-bold text-dark"
+                                          th:text="${result.jobTitle != null ? result.jobTitle : '제목 없음'}"></span>
+                            </td>
+                            <td class="align-middle text-center">
+                                    <span class="badge rounded-pill bg-info text-dark fw-bold px-3 py-2"
+                                          style="min-width: 60px;"
+                                          th:text="${result.matchingScore} + '점'"></span>
+                            </td>
+                            <td class="align-middle text-center text-muted" style="font-size: 0.9rem;">
+                                <span th:text="${result.createdAt != null ? #temporals.format(result.createdAt, 'yyyy-MM-dd HH:mm') : '-'}"></span>
+                            </td>
+                            <td class="text-center pe-4 align-middle">
+                                <a th:href="@{/ai/detail/{id}(id=${result.id})}"
+                                   class="btn btn-sm btn-outline-primary px-3">상세보기</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -4,11 +4,13 @@ import org.example.ai.aiEntity.CareerResult;
 import org.example.ai.aiRecord.CareerMatching;
 import org.example.ai.aiRecord.JobAnalysis;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 public class ChatController {
@@ -67,7 +69,6 @@ public class ChatController {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return careerRepository.save(result); // 저장된 데이터 반환
+        return careerRepository.save(result);
     }
-
 }

@@ -9,3 +9,6 @@ GET {{baseUrl}}/ai/coach?jobDescription=경력 자바 백엔드 개발자 모집
 
 ### [3번] AI 커리어 코치 - 비적합 공고 테스트 (Python)
 GET {{baseUrl}}/ai/coach?jobDescription=파이썬 장고(Django) 기반 데이터 엔지니어 모집합니다.
+
+### [3번] AI 커리어 코치 - 비적합 공고 테스트 (Python)
+GET {{baseUrl}}/ai/history
