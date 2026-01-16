@@ -4,30 +4,64 @@
       layout:decorate="~{layout/layout}">
 
 <div layout:fragment="content">
-  <div class="resume-detail-container">
-    <div class="detail-header">
-      <h2>🚀 AI 이력서 분석 시작</h2>
-      <p class="text-muted">파일을 업로드하면 AI가 공고와의 적합성을 분석합니다.</p>
+  <style>
+    .loader-spinner {
+      border-top-color: #3498db;
+      animation: spinner 1s linear infinite;
+    }
+    @keyframes spinner {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+
+  <div class="resume-detail-container" id="main-content">
+    <div id="upload-section">
+      <div class="detail-header">
+        <h2>🚀 AI 이력서 분석 시작</h2>
+        <p class="text-muted">파일을 업로드하면 AI가 공고와의 적합성을 분석합니다.</p>
+      </div>
+
+      <form th:action="@{/resume/analyze}" method="post" enctype="multipart/form-data" class="mt-4" onsubmit="return showLoading()">
+        <div class="mb-4">
+          <label class="form-label fw-bold">지원하려는 공고 제목</label>
+          <input type="text" name="jobTitle" class="form-control" placeholder="예: 구글 자바 백엔드 개발자 신입" required>
+        </div>
+
+        <div class="upload-box mb-4">
+          <label class="form-label fw-bold">이력서 파일 (PDF / TXT)</label>
+          <input type="file" name="file" class="form-control" accept=".pdf,.txt" required>
+          <div class="form-text mt-2">이력서 원문을 분석하여 매칭 점수와 조언을 드립니다.</div>
+        </div>
+
+        <div class="action-buttons">
+          <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">
+            ✨ AI 분석 리포트 생성하기
+          </button>
+        </div>
+      </form>
     </div>
 
-    <form th:action="@{/resume/analyze}" method="post" enctype="multipart/form-data" class="mt-4">
-      <div class="mb-4">
-        <label class="form-label fw-bold">지원하려는 공고 제목</label>
-        <input type="text" name="jobTitle" class="form-control" placeholder="예: 구글 자바 백엔드 개발자 신입" required>
+    <div id="loading-section" style="display: none;" class="text-center py-5">
+      <div class="d-flex justify-content-center mb-4">
+        <div class="loader-spinner border-4 border-gray-200 h-16 w-16 rounded-full border-t-blue-500"></div>
       </div>
-
-      <div class="upload-box mb-4">
-        <label class="form-label fw-bold">이력서 파일 (PDF / TXT)</label>
-        <input type="file" name="file" class="form-control" accept=".pdf,.txt" required>
-        <div class="form-text mt-2">이력서 원문을 분석하여 매칭 점수와 조언을 드립니다.</div>
+      <h3 class="fw-bold text-dark">AI 면접관이 서류를 검토 중입니다...</h3>
+      <p class="text-muted">잠시만 기다려주세요. 보통 10초 이내에 완료됩니다.</p>
+      <div class="progress mt-4 mx-auto" style="max-width: 400px; height: 10px;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
       </div>
-
-      <div class="action-buttons">
-        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">
-          ✨ AI 분석 리포트 생성하기
-        </button>
-      </div>
-    </form>
+    </div>
   </div>
+
+  <script>
+    function showLoading() {
+      // 1. 폼 숨기기
+      document.getElementById('upload-section').style.display = 'none';
+      // 2. 로딩바 보이기
+      document.getElementById('loading-section').style.display = 'block';
+      return true; // 폼 제출 진행
+    }
+  </script>
 </div>
 </html>
