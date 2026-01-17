@@ -2,100 +2,190 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>이력서 분석 결과</title>
+    <title>AI 이력서 분석 리포트</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .prose h1 { font-size: 1.5rem; font-weight: bold; margin-top: 1rem; }
-        .prose p { margin-bottom: 0.5rem; }
-        .prose ul { list-style-type: disc; margin-left: 1.5rem; }
-        /* 채팅창 스크롤바 디자인 */
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap');
+        body { font-family: 'Pretendard', sans-serif; }
+        .prose h1 { font-size: 1.8rem; font-weight: 800; color: #1e40af; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; }
+        .prose h2 { font-size: 1.4rem; font-weight: 700; color: #1f2937; margin-top: 1.2rem; }
+        .prose p { line-height: 1.7; color: #374151; margin-bottom: 0.8rem; }
+        .prose ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .prose li { margin-bottom: 0.4rem; }
         #chat-window::-webkit-scrollbar { width: 4px; }
         #chat-window::-webkit-scrollbar-thumb { background-color: #e5e7eb; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-100 p-10 pb-20"> <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mb-10">
-    <div class="bg-blue-600 p-6 flex justify-between items-center">
-        <h1 class="text-2xl text-white font-bold">AI 기술 면접관의 분석 리포트</h1>
-        <a href="/resume/history" class="text-blue-100 hover:text-white text-sm underline">분석 이력 보기</a>
+<body class="bg-slate-50 p-4 md:p-10 pb-32">
+<input type="hidden" id="rawResultData" th:value="${result}">
+<input type="hidden" id="reportIdData" th:value="${reportId}">
+<div class="max-w-5xl mx-auto">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">📄 AI 분석 리포트</h1>
+            <p class="text-slate-500 mt-1">이력서와 공고를 바탕으로 AI 면접관이 객관적으로 분석했습니다.</p>
+        </div>
+        <div class="flex gap-2">
+            <a th:href="@{/resume/report/{id}/download(id=${reportId})}"
+               class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
+                📥 PDF 다운로드
+            </a>
+            <a href="/resume/history" class="px-5 py-2.5 bg-white text-slate-700 border border-slate-200 font-semibold rounded-lg shadow-sm hover:bg-slate-50 transition">
+                목록으로
+            </a>
+        </div>
     </div>
 
-    <div class="p-8">
-        <div id="content" class="prose text-gray-800">
-            <div class="flex justify-center p-10" id="loader">
-                <p class="text-blue-500 animate-pulse">리포트를 생성하는 중입니다...</p>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-8">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <div id="content" class="prose max-w-none">
+                    <div class="flex justify-center p-10" id="loader">
+                        <p class="text-blue-500 animate-pulse">AI 면접관의 의견을 정리하는 중...</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="mt-10 border-t pt-6 flex justify-end">
-            <a href="/resume/upload" class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition">다시 분석하기</a>
-            <button onclick="window.print()" class="ml-4 px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">PDF 저장</button>
+        <div class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 sticky top-10">
+                <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="text-blue-500">📊</span> 역량 레이더 차트
+                </h3>
+                <div class="w-full aspect-square">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+                <div class="mt-6 pt-6 border-t border-slate-50">
+                    <button onclick="document.getElementById('chat-container').classList.remove('hidden')"
+                            class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition">
+                        🤖 AI 면접관에게 질문하기
+                    </button>
+                    <a href="/resume/upload" class="block w-full text-center mt-3 py-3 text-slate-500 font-medium hover:text-slate-800 transition">
+                        새로 분석하기
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="chat-container" class="fixed bottom-5 right-5 w-80 md:w-96 shadow-2xl rounded-xl border border-gray-200 bg-white overflow-hidden flex flex-col z-50" style="height: 450px;">
-    <div class="bg-blue-600 p-4 text-white font-bold flex justify-between items-center">
-        <span>🤖 AI 컨설턴트 질문하기</span>
-        <button onclick="document.getElementById('chat-container').classList.toggle('hidden')" class="text-white">✕</button>
+<div id="chat-container" class="hidden fixed bottom-5 right-5 w-80 md:w-96 shadow-2xl rounded-2xl border border-slate-200 bg-white overflow-hidden flex flex-col z-50" style="height: 500px;">
+    <div class="bg-slate-900 p-4 text-white font-bold flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span>AI 컨설턴트</span>
+        </div>
+        <button onclick="document.getElementById('chat-container').classList.add('hidden')" class="hover:text-slate-300">✕</button>
     </div>
-    <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50">
-        <div class="bg-blue-100 text-blue-800 p-3 rounded-lg text-sm self-start max-w-[85%] shadow-sm">
-            분석 결과에 대해 궁금한 점이 있나요? <br><b>"이 직무의 필수 역량이 뭐야?"</b> 같이 물어보세요!
+    <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50 text-sm">
+        <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tl-none shadow-sm">
+            분석 내용에 대해 궁금한 점이 있다면 무엇이든 물어보세요!
         </div>
     </div>
-    <div class="p-4 border-t bg-white">
+    <div class="p-4 bg-white border-t">
         <div class="flex gap-2">
             <input type="text" id="user-input" onkeypress="if(event.keyCode==13) sendMessage()"
-                   class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                   class="flex-1 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                    placeholder="질문을 입력하세요...">
-            <button onclick="sendMessage()" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-bold">전송</button>
+            <button onclick="sendMessage()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition">전송</button>
         </div>
     </div>
 </div>
 
 <script th:inline="javascript">
-    // 1. 마크다운 렌더링
-    const rawMarkdown = [[${result}]];
-    const reportId = [[${reportId}]]; // 컨트롤러에서 넘겨준 ID
+        // 1. 실행 시점을 보장하기 위해 DOMContentLoaded로 감쌉니다.
+        document.addEventListener("DOMContentLoaded", function() {
+        // 2. HTML input 태그에 담긴 데이터를 가져옵니다. (타임리프 직접 주입보다 안전)
+        const rawContent = document.getElementById('rawResultData').value;
+        const currentReportId = document.getElementById('reportIdData').value;
 
-    if (rawMarkdown) {
-        document.getElementById('content').innerHTML = marked.parse(rawMarkdown);
+        if (!rawContent) {
+        console.error("데이터를 불러오지 못했습니다.");
+        return;
+    }
+        console.log("1. 데이터 수신 성공");
+
+        const jsonMatch = rawContent.match(/\[JSON_DATA\]\s*([\s\S]*?)\s*\[\/JSON_DATA\]/i);
+
+        if (jsonMatch && jsonMatch[1]) {
+            try {
+                const chartData = JSON.parse(jsonMatch[1].trim());
+                console.log("2. 추출된 차트 데이터:", chartData);
+
+                // 차트 생성 (ID: scoreChart 유지)
+                const ctx = document.getElementById('scoreChart').getContext('2d');
+                new Chart(ctx, {
+                type: 'radar',
+                data: {
+                labels: chartData.categories,
+                datasets: [{
+                label: '역량 분석',
+                data: chartData.points,
+                backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                borderColor: 'rgb(37, 99, 235)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgb(37, 99, 235)'
+            }]
+            },
+                options: {
+                scales: {
+                r: {
+                suggestedMin: 0,
+                suggestedMax: 100,
+                ticks: { display: false }
+            }
+            },
+                plugins: { legend: { display: false } }
+            }
+            });
+        } catch (e) {
+            console.error("차트 JSON 파싱 에러:", e);
+        }
+    } else {
+        console.warn("본문에서 [JSON_DATA] 태그를 찾지 못했습니다.");
     }
 
-    // 2. 채팅 기능
-    async function sendMessage() {
+        const cleanContent = rawContent.replace(/\[JSON_DATA\][\s\S]*?\[\/JSON_DATA\]/g, "");
+        document.getElementById('content').innerHTML = marked.parse(cleanContent);
+    });
+
+        // 3. 채팅 기능 (함수명 sendMessage 유지)
+        async function sendMessage() {
         const input = document.getElementById('user-input');
-        const chatWindow = document.getElementById('chat-window');
+        // scope 문제 방지를 위해 input 태그에서 직접 ID 다시 읽기
+        const rid = document.getElementById('reportIdData').value;
         const message = input.value.trim();
 
         if (!message) return;
 
-        // 사용자 메시지 표시
         appendMessage('user', message);
         input.value = '';
-
-        // 로딩 표시
         const loadingId = 'loading-' + Date.now();
-        appendMessage('ai', '생각 중...', loadingId);
+        appendMessage('ai', '분석 중입니다...', loadingId);
 
         try {
-            const response = await fetch('/resume/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message, reportId: reportId })
-            });
-            const data = await response.text();
+        const response = await fetch('/resume/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message, reportId: rid })
+    });
+        const data = await response.text();
 
-            // 로딩 메시지 제거 후 AI 답변 표시
-            document.getElementById(loadingId).remove();
-            appendMessage('ai', data);
-        } catch (error) {
-            document.getElementById(loadingId).innerText = '오류가 발생했습니다.';
-        }
+        const loadingElem = document.getElementById(loadingId);
+        if(loadingElem) loadingElem.remove();
+
+        appendMessage('ai', data);
+    } catch (error) {
+        console.error("채팅 에러:", error);
+        const loadingElem = document.getElementById(loadingId);
+        if(loadingElem) loadingElem.innerText = '오류가 발생했습니다.';
+    }
     }
 
-    function appendMessage(sender, text, id = null) {
+        // 4. 메시지 추가 기능 (함수명 appendMessage 유지)
+        function appendMessage(sender, text, id = null) {
         const chatWindow = document.getElementById('chat-window');
         const wrapper = document.createElement('div');
         wrapper.className = 'flex ' + (sender === 'user' ? 'justify-end' : 'justify-start');
@@ -103,17 +193,10 @@
 
         const msgDiv = document.createElement('div');
         msgDiv.className = sender === 'user'
-            ? 'bg-white border border-gray-200 text-gray-800 p-3 rounded-lg text-sm max-w-[85%] shadow-sm'
-            : 'bg-blue-100 text-blue-800 p-3 rounded-lg text-sm max-w-[85%] shadow-sm';
+        ? 'bg-white border border-slate-200 text-slate-800 p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]'
+        : 'bg-blue-100 text-blue-900 p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[85%]';
 
-        msgDiv.innerText = text;
-
-        if (sender === 'ai') {
-            msgDiv.innerHTML = marked.parse(text);
-        } else {
-            msgDiv.innerText = text;
-        }
-
+        msgDiv.innerHTML = sender === 'ai' ? marked.parse(text) : text;
         wrapper.appendChild(msgDiv);
         chatWindow.appendChild(wrapper);
         chatWindow.scrollTop = chatWindow.scrollHeight;
